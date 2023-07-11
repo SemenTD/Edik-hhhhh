@@ -1,43 +1,50 @@
-import asyncio
-from aiogram import Bot, Dispatcher
+import asyncio  # Работа с асинхронностью
 
-from aiogram.filters import Command, Text
-from aiogram.types import Message
+from aiogram import Bot, Dispatcher, F
+from aiogram.filters import Command  # Фильтр для /start, /...
+from aiogram.types import Message , ContentType  # Тип сообщения
 
-from config import config
+from config import config  # Config
 
 API_TOKEN = config.token
 
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
+dp = Dispatcher()  # Менеджер бота
 
-@dp.message(Text(text='blue lock'))
-async def easter_egg(message:Message):
-    await message.answer("blue lock = №1 ")
 
-@dp.message(Text(text='rust'))
-async def easter_egg(message:Message):
-    await message.answer("rust>game world")
+# dp.message - обработка сообщений
+# Command(commands=['start'] Фильтр для сообщений, берём только /start
+@dp.message(Command(commands=['start']))  # Берём только сообщения, являющиеся командой /start
+async def start_command(message: Message):  # message - сообщение, которое прошло через фильтр
+    await message.answer("Привет!")  # Отвечаем на полученное сообщени
 
-@dp.message(Command(commands=["start"]))
-async def start_command(message: Message):
-    await message.answer("Привет!")
+# @dp.message(F.content_type == ContentType.PHOTO)
+# async def echo_photo(message:Message):
+#     await message.answer_photo(message.photo[0].file_id)
+#
+#
+# @dp.message(F.content_type == ContentType.STICKER)
+# async def echo_stiker (message:Message):
+#     await message.answer_sticker(message.sticker.file_id)
+#
+# @dp.message(F.content_type == ContentType.VOICE)
+# async def echo_voice (message:Message):
+#     await message.answer_voice(message.voice.file_id)
 
+@dp.message()
+async def echo_all(message:Message):
+    await message.send_copy(message.chat.id)
 
 async def main():
     try:
-        print("Bot Started")
+        print('Bot Started')
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # Если мы запускаем конкретно этот файл.
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        print("Bot stopped")
-
-@dp.message(Text(text='rust'))
-async def easter_egg(message:Message):
-    await message.answer("rust>game world")
+        print('Bot stopped')
